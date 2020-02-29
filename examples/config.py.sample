@@ -1,0 +1,13 @@
+# coding=utf-8
+
+API_TOKEN = "YOUR_API_TOKEN"
+SERVER_MODE = "sandbox"  # sandbox or production
+SC_API_KEY = "SC_API_KEY"
+SC_VOUCHER_HASH = []  # لیست کد های تخفیف
+
+SOURCE_DEPOSIT_NUMBER = ""  # سپرده مبدا
+SHEBA_NUMBER = "IR"  # شماره شبا
+CARD_NUMBER = ""  # شماره کارت
+CARD_NUMBER2 = ""  # شماره کارت دوم برای کارت به کارت
+PRIVATE_KEY_PATH = ""  # مسیر فایل pem کلید خصوصی
+USER_NAME_WEB_SERVICE = ""  # نام کاربری وب سرویس دریافتی از بانک
