@@ -635,10 +635,9 @@ class PodBanking(PodBase):
             return kwargs
 
         data_ordered.update(kwargs)
-        a = OrderedDict()
+        output = OrderedDict()
         for key, value in data_ordered.items():
             if value is not None and value != "" and value != {}:
-                # a[key] = str(value.encode("utf-8"))
-                a[key] = value
+                output[key] = value
 
-        return a
+        return output
