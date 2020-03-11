@@ -182,5 +182,18 @@ class DataOrdered:
         data["Timestamp"] = ""
         return data
 
+    @staticmethod
+    def get_card_information_by_card_info():
+        data = OrderedDict()
+        data["UserName"] = ""
+        data["SrcCardNumber"] = ""
+        data["DestCardNumber"] = ""
+        data["Cvv2"] = ""
+        data["ExpireMonth"] = ""
+        data["ExpireYear"] = ""
+        data["Pin2"] = ""
+        data["Timestamp"] = ""
+        return data
+
 
 

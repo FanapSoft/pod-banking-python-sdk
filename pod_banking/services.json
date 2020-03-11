@@ -136,5 +136,22 @@
     "products": {
       "production": 35599
     }
+  },
+  "get_getCardInformationByCardInfo": {
+    "platform_url": "base_url",
+    "sub_url": "/nzh/doServiceCall",
+    "http_verb": "post",
+    "products": {
+      "production": 39632
+    }
+  },
+  "post_generateOtp": {
+    "platform_url": "base_url",
+    "sub_url": "/nzh/doServiceCall",
+    "http_verb": "post",
+    "products": {
+      "production": 39635,
+      "sandbox": 47736
+    }
   }
 }

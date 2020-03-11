@@ -21,19 +21,19 @@ class PodBanking(PodBase):
     def __init__(self, api_token, private_key_path, user_name, token_issuer="1", server_type="sandbox",
                  config_path=None,
                  sc_api_key="", sc_voucher_hash=None):
-        self.__private_key = False
         self.__user_name = user_name
         self.__raw_result = {}
-        self.__load_private_key(private_key_path)
+        self.__private_key = self.__load_private_key(private_key_path)
         here = path.abspath(path.dirname(__file__))
         self._services_file_path = path.join(here, "services.json")
         super(PodBanking, self).__init__(api_token, token_issuer, server_type, config_path, sc_api_key,
                                          sc_voucher_hash, path.join(here, "json_schema.json"))
 
-    def __load_private_key(self, private_key_path):
+    @staticmethod
+    def __load_private_key(private_key_path):
         try:
             with open(private_key_path, "r") as private_key:
-                self.__private_key = RSA.importKey(private_key.read())
+                return RSA.importKey(private_key.read())
 
         except FileNotFoundError:
             raise PodException("private key not found")
@@ -514,6 +514,35 @@ class PodBanking(PodBase):
             super(PodBanking, self)._get_sc_product_settings("/billPaymentByDeposit", method_type="post"),
             params=params, headers=self._get_headers(), **kwargs), method="BillPaymentByDeposit")
 
+    def get_card_information_by_card_info(self, source_card_number, destination_card_number, cvv2, expire_month,
+                                          expire_year, pin2, **kwargs):
+        """
+        استعلام اطلاعات کارت و شناسه ارجاع برای کارت به کارت
+
+        :param str source_card_number: کارت مبدا
+        :param str destination_card_number: کارت مقصد
+        :param str cvv2: کد cvv2 کارت مبدا
+        :param str expire_month: ماه انقضا کارت مبدا
+        :param str expire_year: سال انقضا کارت مبدا
+        :param str pin2: رمز دوم / پویا کارت مبدا
+        :return: str
+        """
+        params = {
+            "SrcCardNumber": source_card_number,
+            "DestCardNumber": destination_card_number,
+            "Cvv2": cvv2,
+            "ExpireMonth": expire_month,
+            "ExpireYear": expire_year,
+            "Pin2": pin2
+        }
+
+        params = self.__prepare_params(method_name="get_card_information_by_card_info", **params)
+        self._validate(params, "getCardInformationByCardInfo")
+
+        return self.__parse_response(self._request.call(
+            super(PodBanking, self)._get_sc_product_settings("/getCardInformationByCardInfo"), params=params,
+            headers=self._get_headers(), **kwargs), method="GetCardInformationByCardInfo")
+
     @staticmethod
     def __generate_file_unique_identifier():
         return "ACH{}".format(datetime.now().__format__("%s%f"))
@@ -562,10 +591,21 @@ class PodBanking(PodBase):
 
         params = self.__get_data_for_sign(method_name=method_name, **params)
         data = json.dumps(params, separators=(',', ':'), ensure_ascii=False)
+        return self.__sign_string(data, self.__private_key)
+
+    @staticmethod
+    def __sign_string(data, private_key):
+        """
+        امضا رشته
+
+        :param str data: رشته
+        :param private_key: کلید خصوصی
+        :return: str
+        """
         digest = SHA.new()
         digest.update(data.encode("utf-8"))
 
-        signer = PKCS1_v1_5.new(self.__private_key)
+        signer = PKCS1_v1_5.new(private_key)
         sig = signer.sign(digest)
         if version_info[0] == 2:
             return str(base64.b64encode(sig))
@@ -626,7 +666,8 @@ class PodBanking(PodBase):
             "get_deposit_balance": DataOrdered.get_deposit_balance(),
             "transfer_money": DataOrdered.transfer_money(),
             "get_transfer_state": DataOrdered.get_transfer_state(),
-            "bill_payment_by_deposit": DataOrdered.bill_payment_by_deposit()
+            "bill_payment_by_deposit": DataOrdered.bill_payment_by_deposit(),
+            "get_card_information_by_card_info": DataOrdered.get_card_information_by_card_info()
         }
 
         data_ordered = data.get(method_name, None)

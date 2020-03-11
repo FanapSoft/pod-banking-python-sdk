@@ -361,3 +361,22 @@ class TestPodBanking(unittest.TestCase):
     def test_17_bill_payment_by_deposit_required_params(self):
         with self.assertRaises(TypeError, msg="bill payment by deposit : required params"):
             self.__banking.bill_payment_by_deposit()
+
+    def test_18_get_card_information_by_card_info(self):
+        result = self.__banking.get_card_information_by_card_info(source_card_number=CARD_NUMBER,
+                                                                  destination_card_number=CARD_NUMBER2, cvv2="133",
+                                                                  expire_month="05", expire_year="03", pin2="123456")
+        if version_info[0] == 2:
+            self.assertIsInstance(result, unicode, msg="get card information : check instance")
+        else:
+            self.assertIsInstance(result, str, msg="get card information : check instance")
+
+    def test_18_get_card_information_by_card_info_validation_error(self):
+        with self.assertRaises(InvalidDataException, msg="get card information : validation error"):
+            self.__banking.get_card_information_by_card_info(source_card_number="ASDASDASD",
+                                                             destination_card_number="sad", cvv2="1335555",
+                                                             expire_month="0555", expire_year="0345", pin2="123456")
+
+    def test_18_get_card_information_by_card_info_required_params(self):
+        with self.assertRaises(TypeError, msg="get card information : required params"):
+            self.__banking.get_card_information_by_card_info()
